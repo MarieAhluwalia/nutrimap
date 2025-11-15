@@ -4,4 +4,3 @@ uvicorn
 python-dotenv
 streamlit
 pandas
-os
