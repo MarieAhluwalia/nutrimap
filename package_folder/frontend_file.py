@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 
  # Change this URL to the one of your API
+#API_URL = "http://localhost:8000"
 API_URL = "https://api-nutrimap-1002154750813.europe-west1.run.app/"
 
 st.title("NutriMap - Test")

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import pickle
 
-#from package_folder.iris import my_prediction_function
+from package_folder.iris import my_prediction_function
 
 # FastAPI instance
 app = FastAPI()
