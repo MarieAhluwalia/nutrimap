@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
+import numpy as np
 
 # -------------------------------------------------------
 # CONSTANT: Columns to keep in the cleaned dataset
@@ -27,9 +28,9 @@ RENAME_COLUMNS = {
 # -------------------------------------------------------
 # Default paths
 # -------------------------------------------------------
-RAW_FOLDER = "../raw_data"
-CLEANED_PATH = "../data/processed/foods_cleaned.csv"
-SCALED_PATH = "../data/processed/foods_scaled.csv"
+RAW_FOLDER = "raw_data"
+CLEANED_PATH = "data/processed/foods_cleaned_marie.csv"
+SCALED_PATH = "data/processed/foods_scaled_marie.csv"
 
 # -------------------------------------------------------
 # Function for data cleaning
@@ -77,6 +78,39 @@ def clean_food_data(raw_folder: str = RAW_FOLDER,
     df_clean = df[COLUMNS_TO_KEEP].copy()
 
     df_clean = df_clean.rename(columns=RENAME_COLUMNS)
+    
+    # ---------------------------------------------------
+    # add column with energy in kcal calculated
+    # ---------------------------------------------------
+    df_clean["energy_kcal_calculated"] = (
+        df_clean["fat_g"] * 9 +
+        df_clean["carbs_g"] * 4 +
+        df_clean["protein_g"] * 4
+    ).round(1)
+    
+    # ---------------------------------------------------
+    # replace NaN in sat fat column with 0 where likely 0 
+    # ---------------------------------------------------
+    
+    df_clean["satfat_g"] = np.where(
+    (df_clean["fat_g"] < 3) &
+    (df_clean["satfat_g"].isna()),
+    0,
+    df_clean["satfat_g"]
+    )
+
+    # ---------------------------------------------------
+    # replace NaN in fiber column with 0 where likely 0 
+    # ---------------------------------------------------
+    
+    df_clean["fiber_g"] = np.where(
+    (df_clean["carbs_g"] < 5) &
+    (df_clean["fiber_g"].isna()),
+    0,
+    df_clean["fiber_g"]
+    )
+    
+    
 
     # ---------------------------------------------------
     # Drop duplicates and drop NaN 
@@ -88,11 +122,13 @@ def clean_food_data(raw_folder: str = RAW_FOLDER,
     
     cols_required = [
     "food_item",
-    "Energy",
-    "Total lipid (fat)",
-    "Carbohydrate, by difference",
-    "Protein"
-    ]   
+    "energy_kcal_calculated",
+    "fat_g",
+    "carbs_g",
+    "protein_g", 
+    "fiber_g",
+    "satfat_g"
+    ]
 
     df_clean = df_clean.dropna(subset=cols_required)
     
@@ -104,8 +140,11 @@ def clean_food_data(raw_folder: str = RAW_FOLDER,
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df_clean.to_csv(output_path, index=False)
-
+    
     return df_clean
+
+
+
 
 # -------------------------------------------------------
 # Function for data scaling
