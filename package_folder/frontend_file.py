@@ -1,37 +1,80 @@
 import streamlit as st
 import requests
 import random
+import time
 
- # Change this URL to the one of your API
-#API_URL = "http://localhost:8000"
+# --- PAGE CONFIG ---
+st.set_page_config(page_title="NutriMap Demo", layout="centered")
+
+# --- SIMPLE GREEN THEME OVERRIDES ---
+st.markdown(
+    """
+    <style>
+    /* Light green background tint */
+    .stApp {
+        background-color: #f5fff8;
+    }
+    /* Headings in green */
+    h1, h2, h3 {
+        color: #137333;
+    }
+    /* Primary button styling */
+    .stButton > button {
+        background-color: #22a34f;
+        color: white;
+        border-radius: 8px;
+        border: none;
+        padding: 0.4rem 0.9rem;
+    }
+    .stButton > button:hover {
+        background-color: #1b7c3a;
+        color: white;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Change this URL to your API
 API_URL = "https://api-nutrimap-1002154750813.europe-west1.run.app/"
 
-st.title("Dummy Model - Flowers")
+st.title("NutriMap Demo")
 
-st.write("Nutrimap test - this is currently only the flower example")
+st.markdown(
+    "Below you find a small demo: on top the old flower test model, "
+    "followed by the first NutriMap V1 ingredient selector."
+)
 
-sepal_length = st.slider('Select a value A', min_value=0, max_value=4, value=1, step=1)
-sepal_width = st.slider('Select a value B',  min_value=0, max_value=4, value=1, step=1)
-petal_length = st.slider('Select a value C',  min_value=0, max_value=4, value=1, step=1)
-petal_width = st.slider('Select a value D',  min_value=0, max_value=4, value=1, step=1)
+# ==========================================
+# DEV / DEBUG SECTION – OLD FLOWER MODEL
+# ==========================================
+with st.expander("🔬 Dummy Model – Flowers (dev only)"):
+    st.caption("Legacy Iris model for API testing. Not part of the NutriMap UI.")
 
-url = f"{API_URL}/predict"
-params = {
-    'sepal_length': sepal_length,
-    'sepal_width': sepal_width,
-    'petal_length': petal_length,
-    'petal_width': petal_width,
-}
+    sepal_length = st.slider("Select a value A", min_value=0, max_value=4, value=1, step=1)
+    sepal_width = st.slider("Select a value B", min_value=0, max_value=4, value=1, step=1)
+    petal_length = st.slider("Select a value C", min_value=0, max_value=4, value=1, step=1)
+    petal_width = st.slider("Select a value D", min_value=0, max_value=4, value=1, step=1)
 
-response = requests.get(url, params=params).json()
+    url = f"{API_URL}/predict"
+    params = {
+        "sepal_length": sepal_length,
+        "sepal_width": sepal_width,
+        "petal_length": petal_length,
+        "petal_width": petal_width,
+    }
 
-st.write(f"This flower belongs to category {str(response['prediction'])}")
+    try:
+        response = requests.get(url, params=params, timeout=3).json()
+        st.success(f"This flower belongs to category **{str(response['prediction'])}**")
+    except Exception:
+        st.warning("Backend not reachable – expected for this demo.")
 
-
-st.title("NutriMap - V1")
-
-st.write("Nutrimap test - currently not connected to anything")
-
+# ==========================================
+# MAIN SECTION – NUTRIMAP V1
+# ==========================================
+st.markdown("---")
+st.header("🍽️ NutriMap – V1 Prototype")
 st.write("Select your main ingredients from the dropdowns below:")
 
 # Define ingredient lists once
@@ -50,31 +93,36 @@ fat_list = [
     "Butter", "Cheese", "Tahini", "Peanut Butter"
 ]
 
-# Dropdowns
-protein_option = st.selectbox(
-    "Select your source of protein",
-    protein_list
-)
+# Layout: left = ingredients, right = summary & suggestion
+col_left, col_right = st.columns([2, 1])
 
-carb_option = st.selectbox(
-    "Select your source of carbs",
-    carb_list
-)
+with col_left:
+    protein_option = st.selectbox("🥩 Protein source", protein_list)
+    carb_option = st.selectbox("🍞 Carb source", carb_list)
+    fat_option = st.selectbox("🥑 Fat source", fat_list)
 
-fat_option = st.selectbox(
-    "Select your source of fats",
-    fat_list
-)
+with col_right:
+    st.subheader("Your dish")
+    st.markdown(
+        f"- **Protein:** {protein_option}  \n"
+        f"- **Carbs:** {carb_option}  \n"
+        f"- **Fats:** {fat_option}"
+    )
 
-st.write("Your dish consists of:", protein_option,",", carb_option,",", fat_option)
+    # Button to calculate better alternatives
+    if st.button("Calculate better alternatives"):
+        with st.spinner("Calculating better alternatives..."):
+            time.sleep(1.5)  # simulate processing delay
 
-# Pick random "improved" suggestions
-suggested_protein = random.choice(protein_list)
-suggested_carb = random.choice(carb_list)
-suggested_fat = random.choice(fat_list)
+            # Pick random improvement suggestions
+            suggested_protein = random.choice(protein_list)
+            suggested_carb = random.choice(carb_list)
+            suggested_fat = random.choice(fat_list)
 
-# Display recommendation
-st.write(
-    f"Switching to **{suggested_protein}**, **{suggested_carb}** and **{suggested_fat}** "
-    f"would improve your diet significantly."
-)
+        st.success(
+            f"Better alternatives could be **{suggested_protein}** as protein, "
+            f"**{suggested_carb}** as carbs and **{suggested_fat}** as fats."
+        )
+
+st.markdown("---")
+st.caption("NutriMap V1 prototype – backend not connected yet.")
