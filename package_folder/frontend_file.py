@@ -66,7 +66,7 @@ fat_option = st.selectbox(
     fat_list
 )
 
-st.write("Your dish consists of:", protein_option, carb_option, fat_option)
+st.write("Your dish consists of:", protein_option,",", carb_option,",", fat_option)
 
 # Pick random "improved" suggestions
 suggested_protein = random.choice(protein_list)
