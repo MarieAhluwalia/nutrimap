@@ -6,19 +6,10 @@ import time
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="NutriMap Demo", layout="centered")
 
-# --- SIMPLE GREEN THEME OVERRIDES ---
+# --- GREEN BUTTON ONLY (NO GLOBAL BACKGROUND/TEXT CHANGES) ---
 st.markdown(
     """
     <style>
-    /* Light green background tint */
-    .stApp {
-        background-color: #f5fff8;
-    }
-    /* Headings in green */
-    h1, h2, h3 {
-        color: #137333;
-    }
-    /* Primary button styling */
     .stButton > button {
         background-color: #22a34f;
         color: white;
@@ -35,7 +26,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Change this URL to your API
 API_URL = "https://api-nutrimap-1002154750813.europe-west1.run.app/"
 
 st.title("NutriMap Demo")
@@ -93,13 +83,15 @@ fat_list = [
     "Butter", "Cheese", "Tahini", "Peanut Butter"
 ]
 
-# Layout: left = ingredients, right = summary & suggestion
+# Layout: left = inputs + button, right = summary & suggestion
 col_left, col_right = st.columns([2, 1])
 
 with col_left:
     protein_option = st.selectbox("🥩 Protein source", protein_list)
     carb_option = st.selectbox("🍞 Carb source", carb_list)
     fat_option = st.selectbox("🥑 Fat source", fat_list)
+
+    calculate = st.button("Calculate better alternatives")
 
 with col_right:
     st.subheader("Your dish")
@@ -109,16 +101,15 @@ with col_right:
         f"- **Fats:** {fat_option}"
     )
 
-    # Button to calculate better alternatives
-    if st.button("Calculate better alternatives"):
+    if calculate:
         with st.spinner("Calculating better alternatives..."):
             time.sleep(1.5)  # simulate processing delay
 
-            # Pick random improvement suggestions
             suggested_protein = random.choice(protein_list)
             suggested_carb = random.choice(carb_list)
             suggested_fat = random.choice(fat_list)
 
+        st.subheader("Suggested improvement")
         st.success(
             f"Better alternatives could be **{suggested_protein}** as protein, "
             f"**{suggested_carb}** as carbs and **{suggested_fat}** as fats."
