@@ -7,10 +7,9 @@ def assign_food_group(row):
     Classify a food into a coarse food group using only nutrient data (per 100 g).
 
     Expected columns:
-      - energy_kcal
+      - energy_kcal_calculated
       - protein_g
       - carbs_g
-      - sugars_g
       - fiber_g
       - fat_g
       - satfat_g
@@ -19,10 +18,9 @@ def assign_food_group(row):
       category: str
     """
 
-    kcal     = float(row.get("energy_kcal", 0.0))
+    kcal     = float(row.get("energy_kcal_calculated", 0.0))
     protein  = float(row.get("protein_g", 0.0))
     carbs    = float(row.get("carbs_g", 0.0))
-    sugars   = float(row.get("sugars_g", 0.0))
     fiber    = float(row.get("fiber_g", 0.0))
     fat      = float(row.get("fat_g", 0.0))
     satfat   = float(row.get("satfat_g", 0.0))
@@ -35,7 +33,6 @@ def assign_food_group(row):
     Pshare = 4 * protein / kcal_safe
     Cshare = 4 * carbs   / kcal_safe
     Fshare = 9 * fat     / kcal_safe
-    sugar_ratio = sugars / carbs_safe
 
     # ------------------------
     # 1) Oils & fats
@@ -54,7 +51,7 @@ def assign_food_group(row):
     # ------------------------
     dairy_candidate = (
         protein >= 3 and
-        sugars  >= 3 and
+        carbs  >= 3 and
         satfat  >= 1.5
     )
 
@@ -123,14 +120,14 @@ def assign_food_group(row):
     # ------------------------
     # 6) Sweets / snacks
     # ------------------------
-    if sugar_ratio >= 0.5 and sugars >= 20 and kcal >= 250:
+    if  carbs >= 20 and kcal >= 250:
         return "sweets_snacks"
 
     # ------------------------
     # 7) Fruit
     # ------------------------
     if (
-        sugars >= 8 and
+        carbs >= 8 and
         fat < 5 and
         fiber >= 1.5 and
         kcal < 120
@@ -143,8 +140,7 @@ def assign_food_group(row):
     if (
         kcal < 80 and
         carbs < 15 and
-        fiber >= 2 and
-        sugars < 8
+        fiber >= 2
     ):
         return "nonstarchy_veg"
 
@@ -154,8 +150,7 @@ def assign_food_group(row):
     if (
         15 <= carbs <= 30 and
         60 <= kcal <= 130 and
-        fiber >= 2 and
-        sugars < 7
+        fiber >= 2
     ):
         return "starchy_veg"
 
