@@ -79,6 +79,14 @@ def clean_food_data(raw_folder: str = RAW_FOLDER,
 
     df_clean = df_clean.rename(columns=RENAME_COLUMNS)
     
+    
+    
+    # ---------------------------------------------------
+    # remove branded foods from the dataset 500k ->7k 
+    # ---------------------------------------------------
+    df_clean = df_clean[df_clean["data_type"] != "branded_food"].reset_index(drop=True)
+    
+    
     # ---------------------------------------------------
     # add column with energy in kcal calculated
     # ---------------------------------------------------
