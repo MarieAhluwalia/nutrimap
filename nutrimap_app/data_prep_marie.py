@@ -10,6 +10,7 @@ import numpy as np
 COLUMNS_TO_KEEP = [
     "food_item",
     "Energy",
+    "data_type",
     "Total lipid (fat)",
     "Fatty acids, total saturated",
     "Carbohydrate, by difference",
