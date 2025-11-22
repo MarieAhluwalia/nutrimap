@@ -21,3 +21,6 @@ def my_prediction_function(sepal_length, sepal_width, petal_length, petal_width)
     prediction = model.predict([[sepal_length, sepal_width, petal_length, petal_width]])
 
     return prediction
+
+def hi():
+    return "hi"
