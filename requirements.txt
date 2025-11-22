@@ -4,3 +4,6 @@ uvicorn
 python-dotenv
 streamlit
 pandas
+langchain
+langchain-core
+langchain-google-genai
